@@ -1,0 +1,8 @@
+
+{
+    "region" : "us-east-2",
+    "profile" : "default",
+    "s3-bucket" : "chipsmmo.api",
+    "template"  : "serverless.template",
+    "stack-name" : "chipsmmo-api"
+}
