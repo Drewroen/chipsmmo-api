@@ -3,6 +3,7 @@ using Amazon.DynamoDBv2;
 using ChipsMMO.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +45,17 @@ namespace ChipsMMO
                         IssuerSigningKey = new SymmetricSecurityKey(Utility.StringToByteArray(Environment.GetEnvironmentVariable("CHIPSMMO_ACCESS_TOKEN_SECRET")))
                     };
                 });
+
+            var corsBuilder = new CorsPolicyBuilder();
+            corsBuilder.AllowAnyHeader();
+            corsBuilder.AllowAnyMethod();
+            corsBuilder.WithOrigins("http://localhost:4200", "http://chipsmmo.cc");
+            corsBuilder.AllowCredentials();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("ChipsMMO", corsBuilder.Build());
+            });
 
             services.AddMvc(option => option.EnableEndpointRouting = false);
 
@@ -90,19 +102,21 @@ namespace ChipsMMO
 
             app.UseRouting();
 
+            app.UseCors("ChipsMMO");
+
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseMvc();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
             app.UseOpenApi();
             app.UseSwaggerUi3();
 
             app.UseStaticFiles();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
         }
     }
 }

@@ -86,7 +86,7 @@ namespace ChipsMMO.Services
             await _dynamoService.Delete<RefreshTokenInfo>(username);
         }
 
-        public async Task<string> UpdateAccessToken(RefreshTokenRequest refreshTokenRequest)
+        public async Task<TokenResponse> UpdateAccessToken(RefreshTokenRequest refreshTokenRequest)
         {
             var refreshToken = refreshTokenRequest.RefreshToken;
             if (_tokenService.IsRefreshTokenValid(refreshToken))
@@ -96,7 +96,11 @@ namespace ChipsMMO.Services
 
                 if (refreshTokenRequest.RefreshToken == refreshTokenInfo?.RefreshToken)
                 {
-                    return _tokenService.GenerateJSONAccessToken(username);
+                    return new TokenResponse()
+                    {
+                        AccessToken = _tokenService.GenerateJSONAccessToken(username),
+                        RefreshToken = refreshTokenRequest.RefreshToken
+                    };
                 }
                 else
                 {
@@ -120,7 +124,7 @@ namespace ChipsMMO.Services
 
             EncryptedPassword encryptedPassword = _encryptionService.Encrypt(password);
 
-            return (encryptedPassword.EncryptedData == accountInfo.Password.EncryptedData) && (encryptedPassword.IV == accountInfo.Password.IV);
+            return (encryptedPassword.EncryptedData == accountInfo?.Password?.EncryptedData) && (encryptedPassword.IV == accountInfo?.Password?.IV);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace ChipsMMO.Controllers
                 return Ok(await _accountService.GetAccountInfo(username));
             } catch (AccountNotFound)
             {
-                return Forbid("Account not found");
+                return BadRequest("Account not found");
             }
         }
 
@@ -88,10 +88,10 @@ namespace ChipsMMO.Controllers
                 return Ok(await _accountService.UpdateAccessToken(refreshTokenRequest));
             } catch (RefreshTokenDoesNotMatch)
             {
-                return Forbid("Refresh token does not match");
+                return BadRequest("Refresh token does not match");
             } catch (RefreshTokenInvalid)
             {
-                return Forbid("Refresh token invalid");
+                return BadRequest("Refresh token invalid");
             }
         }
     }

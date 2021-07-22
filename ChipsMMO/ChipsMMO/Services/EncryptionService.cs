@@ -1,7 +1,6 @@
 using System.IO;
 using System.Security.Cryptography;
 using System;
-using System.Text;
 using ChipsMMO.Models.Misc;
 
 namespace ChipsMMO.Services

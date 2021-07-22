@@ -7,7 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChipsMMO", "ChipsMMO\ChipsM
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Environment", "Environment", "{C36C1EAF-0AC1-4CC4-8A28-9CF765D678D8}"
 	ProjectSection(SolutionItems) = preProject
-		..\.env = ..\.env
 		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
