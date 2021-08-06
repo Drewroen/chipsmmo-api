@@ -1,10 +1,8 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace ChipsMMO.Services
 {
@@ -14,34 +12,34 @@ namespace ChipsMMO.Services
 
         public string GenerateJSONAccessToken(string username)
         {
-            var securityKey = new SymmetricSecurityKey(Utility.StringToByteArray(Environment.GetEnvironmentVariable("CHIPSMMO_ACCESS_TOKEN_SECRET")));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var securityKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("CHIPSMMO_ACCESS_TOKEN_SECRET"));
+            var signingCredentials = new SigningCredentials(
 
-            var token = new JwtSecurityToken("chipsmmo.cc",
-              "chipsmmo.cc",
-              new[] { new Claim(JwtRegisteredClaimNames.Sub, username) },
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
-
-            token.Payload.Add("iat", ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds());
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            new SymmetricSecurityKey(securityKey),
+            SecurityAlgorithms.HmacSha256,
+            SecurityAlgorithms.Sha256);
+            var nbf = DateTime.UtcNow.AddYears(-1); ;
+            var exp = DateTime.UtcNow.AddMinutes(120);
+            var payload = new JwtPayload("chipsmmo.cc", "chipsmmo.cc", new[] { new Claim(JwtRegisteredClaimNames.Sub, username) }, nbf, exp);
+            var jwtToken = new JwtSecurityToken(new JwtHeader(signingCredentials), payload);
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            return jwtTokenHandler.WriteToken(jwtToken);
         }
 
         public string GenerateJSONRefreshToken(string username)
         {
-            var securityKey = new SymmetricSecurityKey(Utility.StringToByteArray(Environment.GetEnvironmentVariable("CHIPSMMO_REFRESH_TOKEN_SECRET")));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var securityKey = Convert.FromBase64String(Environment.GetEnvironmentVariable("CHIPSMMO_REFRESH_TOKEN_SECRET"));
+            var signingCredentials = new SigningCredentials(
 
-            var token = new JwtSecurityToken("chipsmmo.cc",
-              "chipsmmo.cc",
-              new[] { new Claim(JwtRegisteredClaimNames.Sub, username) },
-              expires: DateTime.Now.AddYears(1),
-              signingCredentials: credentials);
-
-            token.Payload.Add("iat", ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds());
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            new SymmetricSecurityKey(securityKey),
+            SecurityAlgorithms.HmacSha256,
+            SecurityAlgorithms.Sha256);
+            var nbf = DateTime.UtcNow.AddYears(-1);
+            var exp = DateTime.UtcNow.AddYears(1);
+            var payload = new JwtPayload("chipsmmo.cc", "chipsmmo.cc", new[] { new Claim(JwtRegisteredClaimNames.Sub, username) }, nbf, exp);
+            var jwtToken = new JwtSecurityToken(new JwtHeader(signingCredentials), payload);
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            return jwtTokenHandler.WriteToken(jwtToken);
         }
 
         public string GetUserNameFromRefreshToken(string refreshToken)
@@ -73,7 +71,7 @@ namespace ChipsMMO.Services
                     ValidateAudience = true,
                     ValidIssuer = "chipsmmo.cc",
                     ValidAudience = "chipsmmo.cc",
-                    IssuerSigningKey = new SymmetricSecurityKey(Utility.StringToByteArray(Environment.GetEnvironmentVariable("CHIPSMMO_REFRESH_TOKEN_SECRET")))
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Environment.GetEnvironmentVariable("CHIPSMMO_REFRESH_TOKEN_SECRET")))
                 }, out _);
             }
             catch

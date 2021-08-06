@@ -2,6 +2,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System;
 using ChipsMMO.Models.Misc;
+using System.Text;
 
 namespace ChipsMMO.Services
 {
@@ -12,10 +13,10 @@ namespace ChipsMMO.Services
         public EncryptionService()
         {
             var cryptoString = Environment.GetEnvironmentVariable("CHIPSMMO_PASSWORD_CRYPTO_SECRET");
-            cryptoSecret = Utility.StringToByteArray(cryptoString);
+            cryptoSecret = StringToByteArray(cryptoString);
 
             var ivString = Environment.GetEnvironmentVariable("CHIPSMMO_PASSWORD_IV_SECRET");
-            ivSecret = Utility.StringToByteArray(ivString);
+            ivSecret = StringToByteArray(ivString);
         }
         public EncryptedPassword Encrypt(string plainText)
         {
@@ -43,8 +44,8 @@ namespace ChipsMMO.Services
 
             return new EncryptedPassword()
             {
-                IV = Utility.ByteArrayToString(ivSecret),
-                EncryptedData = Utility.ByteArrayToString(encrypted)
+                IV = ByteArrayToString(ivSecret),
+                EncryptedData = ByteArrayToString(encrypted)
             };
         }
         public string Decrypt(string cipherText)
@@ -58,7 +59,7 @@ namespace ChipsMMO.Services
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-                using (MemoryStream msDecrypt = new MemoryStream(Utility.StringToByteArray(cipherText)))
+                using (MemoryStream msDecrypt = new MemoryStream(StringToByteArray(cipherText)))
                 {
                     using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     {
@@ -71,6 +72,23 @@ namespace ChipsMMO.Services
             }
 
             return plaintext;
+        }
+
+        private static byte[] StringToByteArray(string hex)
+        {
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
+        }
+
+        private static string ByteArrayToString(byte[] ba)
+        {
+            StringBuilder hex = new StringBuilder(ba.Length * 2);
+            foreach (byte b in ba)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
         }
     }
 }

@@ -42,7 +42,7 @@ namespace ChipsMMO
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = "chipsmmo.cc",
                         ValidAudience = "chipsmmo.cc",
-                        IssuerSigningKey = new SymmetricSecurityKey(Utility.StringToByteArray(Environment.GetEnvironmentVariable("CHIPSMMO_ACCESS_TOKEN_SECRET")))
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Environment.GetEnvironmentVariable("CHIPSMMO_ACCESS_TOKEN_SECRET")))
                     };
                 });
 
