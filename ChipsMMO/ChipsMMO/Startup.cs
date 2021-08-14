@@ -49,7 +49,7 @@ namespace ChipsMMO
             var corsBuilder = new CorsPolicyBuilder();
             corsBuilder.AllowAnyHeader();
             corsBuilder.AllowAnyMethod();
-            corsBuilder.WithOrigins("http://localhost:4200", "http://chipsmmo.cc");
+            corsBuilder.WithOrigins("http://localhost:4200", "https://www.chipsmmo.cc");
             corsBuilder.AllowCredentials();
 
             services.AddCors(options =>
